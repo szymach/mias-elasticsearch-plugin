@@ -1,0 +1,103 @@
+buildscript {
+    ext {
+        pluginName = 'mias-elasticsearch'
+        pluginClassname = 'mias.elasticsearch.plugin.fsi.elasticsearch.index.analysis.MiasElasticsearchPlugin'
+        pluginDescription = 'MIaS math tokenizer for ElasticSearch'
+        versions = [
+            'elasticsearch': '7.10.1',
+            'lucene'       : '8.7.0',
+            'groovy'       : '2.5.13'
+        ]
+    }
+}
+
+plugins {
+    id 'java'
+    id 'signing'
+    id 'maven-publish'
+    id 'java-library'
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.restlet.talend.com/" }
+    maven { url "https://jitpack.io"  }
+}
+
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+
+group = 'pl.fsi.elasticsearch.plugin'
+version = versions.elasticsearch
+
+dependencies {
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'com.github.szymach:MIaSMath:76d4ad0f3a'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
+}
+
+configurations {
+    providedCompile
+    wagon
+    releaseJars {
+        extendsFrom implementation
+        exclude group: 'org.elasticsearch'
+        exclude group: 'org.apache.lucene'
+        exclude group: 'org.apache.solr'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+        exclude group: 'org.slf4j'
+        exclude group: 'org.apache.logging.log4j'
+        exclude module: 'hppc'
+        exclude module: 'spatial4j'
+        exclude module: 'jose4j'
+        exclude module: 'junit'
+    }
+}
+
+task makePluginDescriptor(type: Copy) {
+    from 'src/main/templates'
+    into "${project.buildDir}/tmp/plugin"
+    expand([
+            'descriptor': [
+                'name'                : pluginName,
+                'classname'           : pluginClassname,
+                'description'         : pluginDescription,
+                'version'             : project.property('version'),
+                'javaVersion'         : project.property('targetCompatibility'),
+                'elasticsearchVersion': versions.elasticsearch
+            ]
+    ])
+}
+
+task buildPluginZip(type: Zip, dependsOn: [':lib:javadocJar', ':lib:sourcesJar', ':lib:jar', ':lib:makePluginDescriptor']) {
+    from "${project.buildDir}/${libsDirName}"
+    from configurations.releaseJars
+    from 'build/tmp/plugin'
+}
+
+task unpackPlugin(type: Copy, dependsOn: [':lib:buildPluginZip']) {
+    delete "plugins"
+    from "${project.buildDir}/${libsDirName}"
+    from 'build/tmp/plugin'
+    into "plugins/${pluginName}"
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+artifacts {
+    archives buildPluginZip
+}
