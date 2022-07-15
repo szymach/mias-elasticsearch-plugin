@@ -4,7 +4,7 @@ buildscript {
         pluginClassname = 'mias.elasticsearch.plugin.fsi.elasticsearch.index.analysis.MiasElasticsearchPlugin'
         pluginDescription = 'MIaS math tokenizer for ElasticSearch'
         versions = [
-            'elasticsearch': '7.10.1',
+            'elasticsearch': '7.17.0',
             'lucene'       : '8.7.0',
             'groovy'       : '2.5.13'
         ]
@@ -35,7 +35,7 @@ version = versions.elasticsearch
 dependencies {
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
     implementation 'com.google.guava:guava:30.1.1-jre'
-    implementation 'com.github.szymach:MIaSMath:76d4ad0f3a'
+    implementation 'com.github.fsi-open:MIaSMath:0bba2171'
 }
 
 tasks.named('test') {
@@ -43,8 +43,8 @@ tasks.named('test') {
 }
 
 compileJava {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 configurations {
@@ -80,13 +80,13 @@ task makePluginDescriptor(type: Copy) {
     ])
 }
 
-task buildPluginZip(type: Zip, dependsOn: [':lib:javadocJar', ':lib:sourcesJar', ':lib:jar', ':lib:makePluginDescriptor']) {
+task buildPluginZip(type: Zip, dependsOn: [':javadocJar', ':sourcesJar', ':jar', ':makePluginDescriptor']) {
     from "${project.buildDir}/${libsDirName}"
     from configurations.releaseJars
     from 'build/tmp/plugin'
 }
 
-task unpackPlugin(type: Copy, dependsOn: [':lib:buildPluginZip']) {
+task unpackPlugin(type: Copy, dependsOn: [':buildPluginZip']) {
     delete "plugins"
     from "${project.buildDir}/${libsDirName}"
     from 'build/tmp/plugin'

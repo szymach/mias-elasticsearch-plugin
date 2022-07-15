@@ -6,24 +6,21 @@
  */
 package mias.elasticsearch.plugin.fsi.elasticsearch.index.analysis;
 
+import java.util.Map;
+
 import org.elasticsearch.index.analysis.TokenizerFactory;
 import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider;
 import org.elasticsearch.plugins.AnalysisPlugin;
 import org.elasticsearch.plugins.Plugin;
-
-import java.util.Map;
 
 import static java.util.Collections.singletonMap;
 
 public class MiasElasticsearchPlugin extends Plugin implements AnalysisPlugin {
 
     /**
-     * Morfologik analyzer name.
+     * MIaS tokenizer name.
      */
     public static final String TOKENIZER_NAME = "mias-math";
-
-    public MiasElasticsearchPlugin() {
-    }
 
     @Override
     public Map<String, AnalysisProvider<TokenizerFactory>> getTokenizers() {
