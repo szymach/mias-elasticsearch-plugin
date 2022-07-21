@@ -18,7 +18,7 @@ import static java.util.Collections.singletonMap;
 public class MiasElasticsearchPlugin extends Plugin implements AnalysisPlugin {
 
     /**
-     * MIaS tokenizer name.
+     * MIaS Math tokenizer name.
      */
     public static final String TOKENIZER_NAME = "mias-math";
 
