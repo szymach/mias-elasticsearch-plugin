@@ -15,12 +15,20 @@ import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.analysis.AbstractTokenizerFactory;
 
 public class MathTokenizerFactory extends AbstractTokenizerFactory {
+    private final boolean subformulae;
+    private final boolean reduceWeights;
+    private final MathTokenizer.MathMLType type;
+
     public MathTokenizerFactory(IndexSettings indexSettings, Environment environment, String name, Settings settings) {
         super(indexSettings, settings, name);
+
+        subformulae = settings.getAsBoolean("subformulae", true);
+        reduceWeights = settings.getAsBoolean("reduceWeights", true);
+        type = MathTokenizer.MathMLType.valueOf(settings.get("use_type", "BOTH"));
     }
 
     @Override
     public Tokenizer create() {
-        return new MathTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, true, MathTokenizer.MathMLType.BOTH);
+        return new MathTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, subformulae, type, reduceWeights);
     }
 }
