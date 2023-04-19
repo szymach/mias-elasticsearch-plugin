@@ -4,7 +4,7 @@ buildscript {
         pluginClassname = 'mias.elasticsearch.plugin.fsi.elasticsearch.index.analysis.MiasElasticsearchPlugin'
         pluginDescription = 'MIaS math tokenizer for ElasticSearch'
         versions = [
-            'elasticsearch': '7.17.3',
+            'elasticsearch': '7.17.9',
             'lucene'       : '8.7.0',
             'groovy'       : '2.5.13'
         ]
